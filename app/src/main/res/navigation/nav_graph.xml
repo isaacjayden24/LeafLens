@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_welcomeFragment_to_cameraFragment"
             app:destination="@id/cameraFragment" />
+        <action
+            android:id="@+id/action_welcomeFragment_to_uploadFragment"
+            app:destination="@id/uploadFragment" />
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
@@ -22,10 +25,30 @@
         <action
             android:id="@+id/action_cameraFragment_to_resultFragment"
             app:destination="@id/resultFragment" />
+
+
+
+
     </fragment>
     <fragment
         android:id="@+id/resultFragment"
         android:name="com.project.leaflens.ResultFragment"
         android:label="fragment_result"
-        tools:layout="@layout/fragment_result" />
+        tools:layout="@layout/fragment_result"
+        >
+
+        <argument
+            android:name="imagePath"
+            app:argType="string" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/uploadFragment"
+        android:name="com.project.leaflens.UploadFragment"
+        android:label="fragment_upload"
+        tools:layout="@layout/fragment_upload" >
+        <action
+            android:id="@+id/action_uploadFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
+    </fragment>
 </navigation>

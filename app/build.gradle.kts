@@ -1,11 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
     namespace = "com.project.leaflens"
     compileSdk = 35
+
+
 
     defaultConfig {
         applicationId = "com.project.leaflens"
@@ -33,7 +36,11 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    aaptOptions {
+        noCompress ("tflite")
+    }
 }
+
 
 dependencies {
 
@@ -51,7 +58,12 @@ dependencies {
 
     implementation ("org.tensorflow:tensorflow-lite:2.12.0") // Core TensorFlow Lite
     implementation ("org.tensorflow:tensorflow-lite-task-vision:0.4.3") // For image classification
-    implementation ("androidx.camera:camera-core:1.3.0") // CameraX (optional)
+
+    implementation ("androidx.camera:camera-core:1.3.0") // CameraX
     implementation ("androidx.camera:camera-lifecycle:1.3.0")
     implementation ("androidx.camera:camera-view:1.3.0")
+    implementation ("androidx.camera:camera-camera2:1.3.0")
+
+
+
 }
