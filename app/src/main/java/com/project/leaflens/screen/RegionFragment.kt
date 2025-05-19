@@ -1,9 +1,11 @@
 package com.project.leaflens.screen
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +17,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.project.leaflens.R
 
 
-
 /**
  * A simple [Fragment] subclass.
  * Use the [RegionFragment.newInstance] factory method to
@@ -24,6 +25,8 @@ import com.project.leaflens.R
 class RegionFragment : Fragment() {
     private lateinit var originalImageView: ImageView
     private lateinit var processedImageView: ImageView
+
+    private var imageUri: Uri? = null
 
 
 
@@ -58,14 +61,28 @@ class RegionFragment : Fragment() {
 
 
 
-        // Load your image from resources
-        val originalBitmap = BitmapFactory.decodeResource(resources, R.drawable.diseasemaize)
 
-        originalImageView.setImageBitmap(originalBitmap)
+        // Retrieve the image URI from arguments
+        arguments?.getString("imagePath")?.let {
+            imageUri = Uri.parse(it)
+            Log.d("RegionFragment", "Received image URI: $imageUri")
 
-        // Process the image to highlight diseased regions
-        val processedBitmap = highlightDiseasedRegions(originalBitmap)
-        processedImageView.setImageBitmap(processedBitmap)
+            // Load and display the original image
+            originalImageView.setImageURI(imageUri)
+
+            // Load your image from URI for processing
+            val originalBitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, imageUri)
+
+            // Process the image to highlight diseased regions
+            val processedBitmap = highlightDiseasedRegions(originalBitmap)
+            processedImageView.setImageBitmap(processedBitmap)
+        }
+
+
+
+
+
+
 
 
     }
@@ -73,26 +90,7 @@ class RegionFragment : Fragment() {
 
 
 
-   /* private fun highlightDiseasedRegions(bitmap: Bitmap): Bitmap? {
-        val output = bitmap.config?.let { bitmap.copy(it, true) }
 
-        for (x in 0 until bitmap.width) {
-            for (y in 0 until bitmap.height) {
-                val pixel = bitmap.getPixel(x, y)
-
-                //  Identify yellowish/brownish regions
-                val red = Color.red(pixel)
-                val green = Color.green(pixel)
-                val blue = Color.blue(pixel)
-
-                //  color threshold for disease detection
-                if (red > 100 && green < 100 && blue < 100) {
-                    output?.setPixel(x, y, Color.RED) // Highlight with red color
-                }
-            }
-        }
-        return output
-    }*/
 
     private fun highlightDiseasedRegions(bitmap: Bitmap): Bitmap? {
         // a mutable copy of the original image
@@ -131,3 +129,26 @@ class RegionFragment : Fragment() {
 
 
 }
+
+
+
+/* private fun highlightDiseasedRegions(bitmap: Bitmap): Bitmap? {
+       val output = bitmap.config?.let { bitmap.copy(it, true) }
+
+       for (x in 0 until bitmap.width) {
+           for (y in 0 until bitmap.height) {
+               val pixel = bitmap.getPixel(x, y)
+
+               //  Identify yellowish/brownish regions
+               val red = Color.red(pixel)
+               val green = Color.green(pixel)
+               val blue = Color.blue(pixel)
+
+               //  color threshold for disease detection
+               if (red > 100 && green < 100 && blue < 100) {
+                   output?.setPixel(x, y, Color.RED) // Highlight with red color
+               }
+           }
+       }
+       return output
+   }*/

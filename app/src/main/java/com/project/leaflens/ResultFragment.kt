@@ -88,7 +88,12 @@ class ResultFragment : Fragment() {
         }
 
         regionBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_resultFragment_to_regionFragment)
+
+            imageUri?.let { uri ->
+                val action = ResultFragmentDirections.actionResultFragmentToRegionFragment(uri.toString())
+                findNavController().navigate(action)
+            }
+           // findNavController().navigate(R.id.action_resultFragment_to_regionFragment)
         }
 
         return view

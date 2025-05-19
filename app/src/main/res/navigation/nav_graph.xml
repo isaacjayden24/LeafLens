@@ -75,5 +75,14 @@
         tools:layout="@layout/fragment_region" >
 
 
+        <argument
+            android:name="imagePath"
+            app:argType="string" />
+
     </fragment>
+
+
+
+
+
 </navigation>
