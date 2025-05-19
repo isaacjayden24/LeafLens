@@ -1,9 +1,13 @@
 package com.project.leaflens
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +19,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
+import org.tensorflow.lite.DataType
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 
 /**
@@ -41,15 +50,11 @@ class UploadFragment : Fragment() {
         uploadButton = view.findViewById(R.id.uploadButton)
         classifyButton = view.findViewById(R.id.classifyButton)
 
-
-
         val toolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
-
-        // Enable the back button
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-          // Handle the navigation icon click
+        // Handle the navigation icon click
         toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -59,15 +64,22 @@ class UploadFragment : Fragment() {
             pickImage()
         }
 
-        // Button to navigate to ResultFragment with selected image
+        // Button to classify the selected image
         classifyButton.setOnClickListener {
-            selectedImageUri?.let {
-                val bundle = Bundle().apply {
-                    putString("imagePath", it.toString()) // Pass URI as string
+            selectedImageUri?.let { uri ->
+                val bitmap = uriToBitmap(uri)
+                bitmap?.let {
+                    if (validateMaizeImage(it)) {
+                        val bundle = Bundle().apply {
+                            putString("imagePath", uri.toString())
+                        }
+                        findNavController().navigate(R.id.action_uploadFragment_to_resultFragment, bundle)
+                    } else {
+                        showToast("The image is not valid.")
+                    }
                 }
-                findNavController().navigate(R.id.action_uploadFragment_to_resultFragment, bundle)
             } ?: run {
-                Toast.makeText(requireContext(), "Please select an image", Toast.LENGTH_SHORT).show()
+                showToast("Please select an image.")
             }
         }
 
@@ -91,7 +103,120 @@ class UploadFragment : Fragment() {
                 imageView.setImageURI(uri) // Display selected image
             }
         } else {
-            Toast.makeText(requireContext(), "Image selection canceled", Toast.LENGTH_SHORT).show()
+            showToast("Image selection canceled")
         }
     }
+
+    // Convert Uri to Bitmap
+    private fun uriToBitmap(uri: Uri): Bitmap? {
+        return try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(requireContext().contentResolver, uri)
+                ImageDecoder.decodeBitmap(source)
+            } else {
+                MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    // Validate the image using TFLite model
+    private fun validateMaizeImage(bitmap: Bitmap): Boolean {
+        val inputSize = 224
+        val modelPath = "maize_detector_V1_23_0.990.tflite"
+
+        return try {
+            // Load the TFLite model
+            val model = loadModel(requireContext(), modelPath)
+
+            // Prepare the input buffer
+            val inputBuffer = preprocessImage(bitmap, inputSize)
+
+            // Run inference and get prediction
+            val prediction = runInference(model, inputBuffer)
+
+            // Close the model
+            model.close()
+
+            // Return true if prediction is valid
+            prediction >= 0.5f
+        } catch (e: Exception) {
+            e.printStackTrace()
+            showToast("Error during classification: ${e.message}")
+            false
+        }
+    }
+
+    // Load the TFLite model from assets as a MappedByteBuffer
+    private fun loadModel(context: Context, modelPath: String): Interpreter {
+        val assetFileDescriptor = context.assets.openFd(modelPath)
+        val fileInputStream = assetFileDescriptor.createInputStream()
+        val fileChannel = fileInputStream.channel
+        val startOffset = assetFileDescriptor.startOffset
+        val declaredLength = assetFileDescriptor.declaredLength
+
+        // Load the model as a MappedByteBuffer
+        val modelByteBuffer = fileChannel.map(
+            java.nio.channels.FileChannel.MapMode.READ_ONLY,
+            startOffset,
+            declaredLength
+        )
+        return Interpreter(modelByteBuffer)
+    }
+
+    private fun preprocessImage(bitmap: Bitmap, imageSize: Int): ByteBuffer {
+
+        val convertedBitmap = if (bitmap.config != Bitmap.Config.ARGB_8888) {
+            bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        } else {
+            bitmap
+        }
+
+
+        val scaledBitmap = Bitmap.createScaledBitmap(convertedBitmap, imageSize, imageSize, true)
+
+        //  ByteBuffer to store the image data
+        val byteBuffer = ByteBuffer.allocateDirect(4 * imageSize * imageSize * 3) // 4 bytes per float, 3 channels (RGB)
+        byteBuffer.order(ByteOrder.nativeOrder())
+
+        // Iterate through the pixels and add them to the ByteBuffer
+        for (y in 0 until imageSize) {
+            for (x in 0 until imageSize) {
+                val pixel = scaledBitmap.getPixel(x, y)
+
+                // Extract RGB values and normalize them to [0, 1]
+                val r = ((pixel shr 16) and 0xFF) / 255.0f
+                val g = ((pixel shr 8) and 0xFF) / 255.0f
+                val b = (pixel and 0xFF) / 255.0f
+
+                // Put the normalized values into the buffer
+                byteBuffer.putFloat(r)
+                byteBuffer.putFloat(g)
+                byteBuffer.putFloat(b)
+            }
+        }
+
+        return byteBuffer
+    }
+
+
+
+
+    // Run the inference and obtain the prediction
+    private fun runInference(model: Interpreter, inputBuffer: ByteBuffer): Float {
+        val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1), DataType.FLOAT32)
+        model.run(inputBuffer, outputBuffer.buffer.rewind())
+        return outputBuffer.floatArray[0]
+    }
+
+    // Display a toast message
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
 }
+
+
+
+
