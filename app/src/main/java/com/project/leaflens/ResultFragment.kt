@@ -8,9 +8,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.appbar.MaterialToolbar
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.io.IOException
@@ -26,10 +30,14 @@ import java.nio.channels.FileChannel
  * create an instance of this fragment.
  */
 
+
 class ResultFragment : Fragment() {
 
     private lateinit var imageView: ImageView
     private lateinit var resultText: TextView
+    private lateinit var solutionBtn: Button
+    private lateinit var descriptionTextView:TextView
+
     private var imageUri: Uri? = null
     private lateinit var interpreter: Interpreter
 
@@ -39,6 +47,27 @@ class ResultFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_result, container, false)
         imageView = view.findViewById(R.id.imageViewResult)
         resultText = view.findViewById(R.id.textResult)
+        solutionBtn = view.findViewById(R.id.solutionBtn)
+        descriptionTextView=view.findViewById(R.id.descriptionTextView)
+
+
+
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+
+       // Enable the back button
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+       // Handle the navigation icon click
+        toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
+
+
+
+
+
 
         // Retrieve the image URI from arguments
         arguments?.getString("imagePath")?.let {
@@ -47,10 +76,12 @@ class ResultFragment : Fragment() {
             processImage()
         }
 
+        solutionBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_resultFragment_to_solutionFragment)
+        }
+
         return view
     }
-
-
 
     private fun processImage() {
         try {
@@ -62,44 +93,58 @@ class ResultFragment : Fragment() {
                 // Load the TFLite Model
                 interpreter = Interpreter(loadModelFile())
 
-                // Model requires 300x300 input
-                val inputWidth = 300
-                val inputHeight = 300
+                // Model requires 224x224 input
+                val inputWidth = 224
+                val inputHeight = 224
                 Log.d("ResultFragment", "Using model input dimensions: $inputWidth x $inputHeight")
 
-                // Resize the image to 300x300
+                // Resize the image to 224x224
                 val resizedBitmap = Bitmap.createScaledBitmap(bitmap, inputWidth, inputHeight, true)
                 Log.d("ResultFragment", "Resized image size: ${resizedBitmap.width} x ${resizedBitmap.height}")
 
-                // Create input buffer - using uint8 (0-255)
-                val byteBuffer = ByteBuffer.allocateDirect(inputWidth * inputHeight * 3)
+                // Create input buffer - using float (0-1) values
+                val byteBuffer = ByteBuffer.allocateDirect(inputWidth * inputHeight * 3 * 4)
                 byteBuffer.order(ByteOrder.nativeOrder())
 
                 val intValues = IntArray(inputWidth * inputHeight)
                 resizedBitmap.getPixels(intValues, 0, inputWidth, 0, 0, inputWidth, inputHeight)
 
-                // Convert image to uint8 format
+                // Normalize pixel values to [0, 1] range
                 for (i in intValues.indices) {
                     val pixel = intValues[i]
-                    byteBuffer.put(((pixel shr 16) and 0xFF).toByte()) // Red
-                    byteBuffer.put(((pixel shr 8) and 0xFF).toByte())  // Green
-                    byteBuffer.put((pixel and 0xFF).toByte())         // Blue
+                    byteBuffer.putFloat(((pixel shr 16) and 0xFF) / 255.0f) // Red
+                    byteBuffer.putFloat(((pixel shr 8) and 0xFF) / 255.0f)  // Green
+                    byteBuffer.putFloat((pixel and 0xFF) / 255.0f)         // Blue
                 }
 
                 byteBuffer.rewind()
                 Log.d("ResultFragment", "Input buffer size: ${byteBuffer.capacity()} bytes")
 
-                // Run inference
-                val outputArray = Array(1) { ByteArray(16) } // Model outputs uint8, not float
+                // Run inference with the corrected output size
+                val outputArray = Array(1) { FloatArray(4) }  // Model's output shape is [1, 4]
                 interpreter.run(byteBuffer, outputArray)
 
-                // Convert output to probabilities
-                val probabilities = outputArray[0].map { it.toInt() and 0xFF }.map { it / 255.0f }
+                // Use the output directly as probabilities (no further scaling)
+                val probabilities = outputArray[0]
 
                 // Display the prediction
-                val result = getTopPrediction(probabilities.toFloatArray())
+                val result = getTopPrediction(probabilities)
                 Log.d("ResultFragment", "Prediction result: $result")
                 resultText.text = result
+
+
+                when (result){
+
+
+
+                    "Blight"->descriptionTextView.text="Blight is a plant disease caused by fungi, bacteria, or environmental factors, leading to rapid browning, wilting, and death of affected plant tissues. It commonly affects leaves, stems, and flowers, spreading quickly under warm, humid conditions, and can result in significant crop loss."
+                    "Common Rust"->descriptionTextView.text="Common rust is caused by fungal pathogens from the Puccinia genus. It appears as reddish-brown pustules on leaves, which can coalesce and cause leaf yellowing and premature death. Warm, moist conditions promote its spread, impacting the plant’s ability to photosynthesize effectively."
+
+
+                }
+
+
+
             }
         } catch (e: Exception) {
             Log.e("ResultFragment", "Error processing image", e)
@@ -108,10 +153,10 @@ class ResultFragment : Fragment() {
         }
     }
 
-
     private fun loadModelFile(): MappedByteBuffer {
         return try {
-            val assetFileDescriptor = requireContext().assets.openFd("1.tflite")
+
+            val assetFileDescriptor = requireContext().assets.openFd("mobilenetv2_v1_44_0.996.tflite")
             val fileInputStream = FileInputStream(assetFileDescriptor.fileDescriptor)
             val fileChannel = fileInputStream.channel
             val mappedByteBuffer = fileChannel.map(
@@ -131,11 +176,7 @@ class ResultFragment : Fragment() {
 
     private fun getTopPrediction(output: FloatArray): String {
         val labels = listOf(
-            "Tomato Healthy", "Tomato Septoria Leaf Spot", "Tomato Bacterial Spot",
-            "Tomato Blight", "Cabbage Healthy", "Tomato Spider Mite",
-            "Tomato Leaf Mold", "Tomato Yellow Leaf Curl Virus", "Soy Frogeye Leaf Spot",
-            "Soy Downy Mildew", "Maize Ravi Corn Rust", "Maize Healthy",
-            "Maize Grey Leaf Spot", "Maize Lethal Necrosis", "Soy Healthy", "Cabbage Black Rot"
+            "Blight","Common Rust","Gray Leaf Spot","Healthy"
         )
 
         val maxIndex = output.indices.maxByOrNull { output[it] } ?: -1

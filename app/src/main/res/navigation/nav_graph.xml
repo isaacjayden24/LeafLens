@@ -40,6 +40,9 @@
         <argument
             android:name="imagePath"
             app:argType="string" />
+        <action
+            android:id="@+id/action_resultFragment_to_solutionFragment"
+            app:destination="@id/solutionFragment" />
 
     </fragment>
     <fragment
@@ -51,4 +54,9 @@
             android:id="@+id/action_uploadFragment_to_resultFragment"
             app:destination="@id/resultFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/solutionFragment"
+        android:name="com.project.leaflens.SolutionFragment"
+        android:label="fragment_solution"
+        tools:layout="@layout/fragment_solution" />
 </navigation>

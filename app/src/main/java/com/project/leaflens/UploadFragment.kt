@@ -11,8 +11,10 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.appbar.MaterialToolbar
 
 
 /**
@@ -38,6 +40,19 @@ class UploadFragment : Fragment() {
         imageView = view.findViewById(R.id.imageView)
         uploadButton = view.findViewById(R.id.uploadButton)
         classifyButton = view.findViewById(R.id.classifyButton)
+
+
+
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+
+        // Enable the back button
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+          // Handle the navigation icon click
+        toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
 
         // Button to open image picker
         uploadButton.setOnClickListener {
