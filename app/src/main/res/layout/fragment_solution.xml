@@ -58,7 +58,7 @@
                     android:id="@+id/treatmentTextview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Apply fungicides such as azoxystrobin and pyraclostrobin."
+                    android:text="....................................."
                     android:textSize="16sp"
                     android:textColor="@color/dark_green"
                     android:layout_marginBottom="16dp" />
@@ -83,7 +83,7 @@
                     android:id="@+id/preventionTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rotate crops, plant resistant varieties, and avoid overheard irrigation."
+                    android:text="........................................"
                     android:textSize="16sp"
                     android:textColor="@color/dark_green"
                     android:layout_marginBottom="16dp" />
@@ -108,7 +108,7 @@
                     android:id="@+id/causeTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Caused by the fungus Cercospora zeae-maydis."
+                    android:text="........................................"
                     android:textSize="16sp"
                     android:textColor="@color/dark_green"
                     android:layout_marginBottom="8dp" />

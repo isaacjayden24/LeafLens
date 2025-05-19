@@ -43,6 +43,9 @@
         <action
             android:id="@+id/action_resultFragment_to_solutionFragment"
             app:destination="@id/solutionFragment" />
+        <action
+            android:id="@+id/action_resultFragment_to_regionFragment"
+            app:destination="@id/regionFragment" />
 
     </fragment>
     <fragment
@@ -58,5 +61,19 @@
         android:id="@+id/solutionFragment"
         android:name="com.project.leaflens.SolutionFragment"
         android:label="fragment_solution"
-        tools:layout="@layout/fragment_solution" />
+        tools:layout="@layout/fragment_solution" >
+
+        <argument
+            android:name="diseaseName"
+            app:argType="string" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/regionFragment"
+        android:name="com.project.leaflens.screen.RegionFragment"
+        android:label="fragment_region"
+        tools:layout="@layout/fragment_region" >
+
+
+    </fragment>
 </navigation>

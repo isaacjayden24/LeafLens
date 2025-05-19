@@ -94,7 +94,6 @@ android:background="@color/light_green">
             android:id="@+id/descriptionTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Common rust is caused by fungal pathogens from the Puccinia genus. It appears as reddish-brown pustules on leaves, which can coalesce and cause leaf yellowing and premature death. Warm, moist conditions promote its spread, impacting the plant’s ability to photosynthesize effective"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
@@ -112,9 +111,10 @@ android:background="@color/light_green">
 
         <!-- Scan Button -->
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/regionBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Retake"
+            android:text="Region"
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:backgroundTint="@color/success_green" />

@@ -76,7 +76,13 @@ class SolutionFragment : Fragment() {
         if (isInternetAvailable()) {
             lifecycleScope.launch {
                 try {
-                    getDiseaseSolution("Maize Rust")
+
+                    arguments?.let {
+                        val diseaseName = arguments?.getString("diseaseName") ?: "Unknown"
+                        Log.d("SolutionFragment", "Disease Name: $diseaseName")
+
+                        getDiseaseSolution(diseaseName)
+                    }
                 } catch (e: Exception) {
                     Log.e("SolutionFragment", "Error fetching disease solution: ${e.message}", e)
                     showSnackbar("An error occurred while fetching data.")

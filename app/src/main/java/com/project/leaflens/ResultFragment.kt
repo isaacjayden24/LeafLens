@@ -37,6 +37,7 @@ class ResultFragment : Fragment() {
     private lateinit var resultText: TextView
     private lateinit var solutionBtn: Button
     private lateinit var descriptionTextView:TextView
+    private lateinit var regionBtn: Button
 
     private var imageUri: Uri? = null
     private lateinit var interpreter: Interpreter
@@ -49,6 +50,8 @@ class ResultFragment : Fragment() {
         resultText = view.findViewById(R.id.textResult)
         solutionBtn = view.findViewById(R.id.solutionBtn)
         descriptionTextView=view.findViewById(R.id.descriptionTextView)
+        regionBtn=view.findViewById(R.id.regionBtn)
+
 
 
 
@@ -77,7 +80,15 @@ class ResultFragment : Fragment() {
         }
 
         solutionBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_resultFragment_to_solutionFragment)
+            // Get the predicted disease name from the resultText TextView
+            val diseaseName = resultText.text.toString()
+            Log.d("ResultFragment", "Disease name: $diseaseName")
+            val action = ResultFragmentDirections.actionResultFragmentToSolutionFragment(diseaseName)
+            findNavController().navigate(action)
+        }
+
+        regionBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_resultFragment_to_regionFragment)
         }
 
         return view
@@ -130,18 +141,23 @@ class ResultFragment : Fragment() {
                 // Display the prediction
                 val result = getTopPrediction(probabilities)
                 Log.d("ResultFragment", "Prediction result: $result")
-                resultText.text = result
 
+               // Display formatted result
+                val confidence = probabilities.maxOrNull()?.times(100) ?: 0.0f
+                resultText.text = "$result (Confidence: ${"%.2f".format(confidence)}%)"
 
-                when (result){
+               // Check the result in the `when` statement
+                when (result) {
 
+                    "Gray Leaf Spot"->descriptionTextView.text="Gray Leaf Spot is a fungal disease caused primarily by *Cercospora* species, affecting turfgrasses like ryegrass and corn. It appears as small, gray to brown lesions on leaves, often with a yellow halo, leading to leaf blight and reduced photosynthesis. Favorable conditions include warm, humid environments, and it spreads through wind, rain, or contaminated equipment.\n"
+                    "Healthy"->descriptionTextView.text="Healthy plant!"
+                    "Blight" -> descriptionTextView.text = "Blight is a plant disease caused by fungi, bacteria, or environmental factors, leading to rapid browning, wilting, and death of affected plant tissues. It commonly affects leaves, stems, and flowers, spreading quickly under warm, humid conditions, and can result in significant crop loss."
 
-
-                    "Blight"->descriptionTextView.text="Blight is a plant disease caused by fungi, bacteria, or environmental factors, leading to rapid browning, wilting, and death of affected plant tissues. It commonly affects leaves, stems, and flowers, spreading quickly under warm, humid conditions, and can result in significant crop loss."
-                    "Common Rust"->descriptionTextView.text="Common rust is caused by fungal pathogens from the Puccinia genus. It appears as reddish-brown pustules on leaves, which can coalesce and cause leaf yellowing and premature death. Warm, moist conditions promote its spread, impacting the plant’s ability to photosynthesize effectively."
-
-
+                    "Common Rust" -> descriptionTextView.text = "Common rust is caused by fungal pathogens from the Puccinia genus. It appears as reddish-brown pustules on leaves, which can coalesce and cause leaf yellowing and premature death. Warm, moist conditions promote its spread, impacting the plant’s ability to photosynthesize effectively."
+                    else -> descriptionTextView.text = "Unknown disease detected."
                 }
+
+
 
 
 
@@ -174,18 +190,22 @@ class ResultFragment : Fragment() {
         }
     }
 
+
+
     private fun getTopPrediction(output: FloatArray): String {
         val labels = listOf(
-            "Blight","Common Rust","Gray Leaf Spot","Healthy"
+            "Blight", "Common Rust", "Gray Leaf Spot", "Healthy"
         )
 
         val maxIndex = output.indices.maxByOrNull { output[it] } ?: -1
         return if (maxIndex != -1) {
-            "${labels[maxIndex]} (Confidence: ${"%.2f".format(output[maxIndex] * 100)}%)"
+            labels[maxIndex]  // Return only the label
         } else {
             "Prediction failed"
         }
     }
+
+
 
     override fun onDestroy() {
         super.onDestroy()
