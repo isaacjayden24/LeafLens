@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:background="@color/light_green"
         android:padding="16dp"
-        tools:context=".SolutionFragment">
+        tools:context=".screen.SolutionFragment">
 
         <!-- Back Button -->
         <com.google.android.material.appbar.MaterialToolbar

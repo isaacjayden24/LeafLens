@@ -17,11 +17,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.project.leaflens.R
 
 
-/**
- * A simple [Fragment] subclass.
- * Use the [RegionFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class RegionFragment : Fragment() {
     private lateinit var originalImageView: ImageView
     private lateinit var processedImageView: ImageView

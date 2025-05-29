@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:background="@color/light_green"
-    tools:context=".UploadFragment">
+    tools:context=".screen.UploadFragment">
 
     <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
