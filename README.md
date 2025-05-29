@@ -1,4 +1,4 @@
-![LeafLens](Docs/screenshots/launcher.png "LeafLens - Detect & Protect Your Crops")
+![LeafLens](Docs/screenshots/corn.png "LeafLens - Detect & Protect Your maize")
 
 ## LeafLens
 **LeafLens** is a smart Android application designed to help farmers and agricultural experts detect diseases in maize (corn) leaves using their phone's camera or gallery.  
