@@ -1,4 +1,4 @@
-package com.project.leaflens.screen
+package com.project.leaflens.ui.screen
 
 import android.os.Bundle
 import android.view.LayoutInflater

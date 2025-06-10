@@ -1,4 +1,4 @@
-package com.project.leaflens.screen
+package com.project.leaflens.ui.screen
 
 import android.Manifest
 import android.content.pm.PackageManager

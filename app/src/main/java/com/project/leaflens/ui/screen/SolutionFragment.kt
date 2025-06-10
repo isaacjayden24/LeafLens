@@ -1,4 +1,4 @@
-package com.project.leaflens.screen
+package com.project.leaflens.ui.screen
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -16,9 +16,9 @@ import androidx.navigation.fragment.findNavController
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
+import com.project.leaflens.BuildConfig
 import com.project.leaflens.R
 import kotlinx.coroutines.launch
-import com.project.leaflens.BuildConfig
 
 /**
  * A simple [Fragment] subclass.

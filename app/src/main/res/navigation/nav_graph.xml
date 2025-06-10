@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/welcomeFragment"
-        android:name="com.project.leaflens.screen.WelcomeFragment"
+        android:name="com.project.leaflens.ui.screen.WelcomeFragment"
         android:label="fragment_welcome"
         tools:layout="@layout/fragment_welcome" >
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/cameraFragment"
-        android:name="com.project.leaflens.screen.CameraFragment"
+        android:name="com.project.leaflens.ui.screen.CameraFragment"
         android:label="fragment_camera"
         tools:layout="@layout/fragment_camera" >
         <action
@@ -32,7 +32,7 @@
     </fragment>
     <fragment
         android:id="@+id/resultFragment"
-        android:name="com.project.leaflens.screen.ResultFragment"
+        android:name="com.project.leaflens.ui.screen.ResultFragment"
         android:label="fragment_result"
         tools:layout="@layout/fragment_result"
         >
@@ -50,7 +50,7 @@
     </fragment>
     <fragment
         android:id="@+id/uploadFragment"
-        android:name="com.project.leaflens.screen.UploadFragment"
+        android:name="com.project.leaflens.ui.screen.UploadFragment"
         android:label="fragment_upload"
         tools:layout="@layout/fragment_upload" >
         <action
@@ -59,7 +59,7 @@
     </fragment>
     <fragment
         android:id="@+id/solutionFragment"
-        android:name="com.project.leaflens.screen.SolutionFragment"
+        android:name="com.project.leaflens.ui.screen.SolutionFragment"
         android:label="fragment_solution"
         tools:layout="@layout/fragment_solution" >
 
@@ -70,7 +70,7 @@
     </fragment>
     <fragment
         android:id="@+id/regionFragment"
-        android:name="com.project.leaflens.screen.RegionFragment"
+        android:name="com.project.leaflens.ui.screen.RegionFragment"
         android:label="fragment_region"
         tools:layout="@layout/fragment_region" >
 
