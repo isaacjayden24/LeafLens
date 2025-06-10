@@ -128,23 +128,3 @@ class RegionFragment : Fragment() {
 
 
 
-/* private fun highlightDiseasedRegions(bitmap: Bitmap): Bitmap? {
-       val output = bitmap.config?.let { bitmap.copy(it, true) }
-
-       for (x in 0 until bitmap.width) {
-           for (y in 0 until bitmap.height) {
-               val pixel = bitmap.getPixel(x, y)
-
-               //  Identify yellowish/brownish regions
-               val red = Color.red(pixel)
-               val green = Color.green(pixel)
-               val blue = Color.blue(pixel)
-
-               //  color threshold for disease detection
-               if (red > 100 && green < 100 && blue < 100) {
-                   output?.setPixel(x, y, Color.RED) // Highlight with red color
-               }
-           }
-       }
-       return output
-   }*/
