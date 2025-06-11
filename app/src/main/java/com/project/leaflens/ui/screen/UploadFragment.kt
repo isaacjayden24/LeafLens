@@ -1,7 +1,6 @@
 package com.project.leaflens.ui.screen
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -17,17 +16,11 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import com.project.leaflens.R
-import org.tensorflow.lite.DataType
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-
-
-
+import com.project.leaflens.viewmodel.ResultViewModel
 
 
 class UploadFragment : Fragment() {
@@ -35,6 +28,7 @@ class UploadFragment : Fragment() {
     private lateinit var imageView: ImageView
     private lateinit var uploadButton: Button
     private lateinit var classifyButton: Button
+    private val resultViewModel: ResultViewModel by viewModels()
     private var selectedImageUri: Uri? = null
 
     override fun onCreateView(
@@ -66,7 +60,7 @@ class UploadFragment : Fragment() {
             selectedImageUri?.let { uri ->
                 val bitmap = uriToBitmap(uri)
                 bitmap?.let {
-                    if (validateMaizeImage(it)) {
+                    if (resultViewModel.validateMaizeImage(requireContext(),it)) {
                         val bundle = Bundle().apply {
                             putString("imagePath", uri.toString())
                         }
@@ -120,19 +114,19 @@ class UploadFragment : Fragment() {
     }
 
     // Validate the image using TFLite model
-    private fun validateMaizeImage(bitmap: Bitmap): Boolean {
+   /* private fun validateMaizeImage(bitmap: Bitmap): Boolean {
         val inputSize = 224
         val modelPath = "maize_detector_V1_23_0.990.tflite"
 
         return try {
             // Load the TFLite model
-            val model = loadModel(requireContext(), modelPath)
+            val model = TFLiteModelLoaderObject.loadModel(requireContext(), modelPath)
 
             // Prepare the input buffer
-            val inputBuffer = preprocessImage(bitmap, inputSize)
+            val inputBuffer = PreprocessImageObject.preprocessImage(bitmap, inputSize)
 
             // Run inference and get prediction
-            val prediction = runInference(model, inputBuffer)
+            val prediction = runInferenceObject.runInference(model, inputBuffer)
 
             // Close the model
             model.close()
@@ -144,10 +138,10 @@ class UploadFragment : Fragment() {
             showToast("Error during classification: ${e.message}")
             false
         }
-    }
+    }*/
 
     // Load the TFLite model from assets as a MappedByteBuffer
-    private fun loadModel(context: Context, modelPath: String): Interpreter {
+   /* private fun loadModel(context: Context, modelPath: String): Interpreter {
         val assetFileDescriptor = context.assets.openFd(modelPath)
         val fileInputStream = assetFileDescriptor.createInputStream()
         val fileChannel = fileInputStream.channel
@@ -161,9 +155,9 @@ class UploadFragment : Fragment() {
             declaredLength
         )
         return Interpreter(modelByteBuffer)
-    }
+    }*/
 
-    private fun preprocessImage(bitmap: Bitmap, imageSize: Int): ByteBuffer {
+   /* private fun preprocessImage(bitmap: Bitmap, imageSize: Int): ByteBuffer {
 
         val convertedBitmap = if (bitmap.config != Bitmap.Config.ARGB_8888) {
             bitmap.copy(Bitmap.Config.ARGB_8888, true)
@@ -196,17 +190,17 @@ class UploadFragment : Fragment() {
         }
 
         return byteBuffer
-    }
+    }*/
 
 
 
 
     // Run the inference and obtain the prediction
-    private fun runInference(model: Interpreter, inputBuffer: ByteBuffer): Float {
+    /*private fun runInference(model: Interpreter, inputBuffer: ByteBuffer): Float {
         val outputBuffer = TensorBuffer.createFixedSize(intArrayOf(1), DataType.FLOAT32)
         model.run(inputBuffer, outputBuffer.buffer.rewind())
         return outputBuffer.floatArray[0]
-    }
+    }*/
 
     // Display a toast message
     private fun showToast(message: String) {

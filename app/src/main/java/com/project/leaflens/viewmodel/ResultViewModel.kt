@@ -1,6 +1,7 @@
 package com.project.leaflens.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
@@ -11,6 +12,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.project.leaflens.utils.ImagePreprocessor
 import com.project.leaflens.utils.TFLiteModelLoader
+import com.project.leaflens.utils.upload.PreprocessImageObject
+import com.project.leaflens.utils.upload.TFLiteModelLoaderObject
+import com.project.leaflens.utils.upload.runInferenceObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.tensorflow.lite.Interpreter
@@ -71,6 +75,36 @@ class ResultViewModel(application: Application): AndroidViewModel(application) {
             "Blight" -> "Blight is a plant disease caused by fungi, bacteria, or environmental factors, leading to rapid browning, wilting, and death of affected plant tissues. It commonly affects leaves, stems, and flowers, spreading quickly under warm, humid conditions, and can result in significant crop loss."
             "Common Rust" -> "Common rust is caused by fungal pathogens from the Puccinia genus. It appears as reddish-brown pustules on leaves, which can coalesce and cause leaf yellowing and premature death. Warm, moist conditions promote its spread, impacting the plant’s ability to photosynthesize effectively."
             else -> "Unknown disease detected."
+        }
+    }
+
+
+
+    //upload fragment code
+
+    fun validateMaizeImage(context: Context, bitmap: Bitmap): Boolean {
+        val inputSize = 224
+        val modelPath = "maize_detector_V1_23_0.990.tflite"
+
+        return try {
+            // Load the TFLite model
+            val model = TFLiteModelLoaderObject.loadModel(context, modelPath)
+
+            // Prepare the input buffer
+            val inputBuffer = PreprocessImageObject.preprocessImage(bitmap, inputSize)
+
+            // Run inference and get prediction
+            val prediction = runInferenceObject.runInference(model, inputBuffer)
+
+            // Close the model
+            model.close()
+
+            // Return true if prediction is valid
+            prediction >= 0.5f
+        } catch (e: Exception) {
+            e.printStackTrace()
+            //Toast.makeText("Error during classification: ${e.message}")
+            false
         }
     }
 
