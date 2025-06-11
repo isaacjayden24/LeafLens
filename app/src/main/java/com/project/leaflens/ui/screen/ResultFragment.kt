@@ -44,7 +44,7 @@ class ResultFragment : Fragment() {
 
 
 
-        setUpToolBar()
+        setUpToolBar(view)
         setupObservers()
 
 
@@ -86,15 +86,13 @@ class ResultFragment : Fragment() {
     }
 
 
-    private fun setUpToolBar(){
-        val toolbar = view?.findViewById<MaterialToolbar>(R.id.topAppBar)
+    private fun setUpToolBar(view: View) {
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
-        // Enable the back button
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Handle the navigation icon click
-        toolbar?.setNavigationOnClickListener {
+        toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
     }
