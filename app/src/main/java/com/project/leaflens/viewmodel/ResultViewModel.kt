@@ -59,7 +59,7 @@ class ResultViewModel(application: Application): AndroidViewModel(application) {
     }
 
     private fun getTopPrediction(probabilities: FloatArray): String {
-        val labels = listOf("Gray Leaf Spot", "Healthy", "Blight", "Common Rust")
+        val labels = listOf("Blight", "Common Rust", "Gray Leaf Spot", "Healthy")
         val maxIndex = probabilities.indices.maxByOrNull { probabilities[it] } ?: -1
         return labels.getOrElse(maxIndex) { "Unknown" }
     }
