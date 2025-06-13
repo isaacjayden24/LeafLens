@@ -2,11 +2,8 @@ package com.project.leaflens.ui.screen
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import com.project.leaflens.R
+import com.project.leaflens.utils.upload.UriBitmapConvertObject.uriToBitmap
 import com.project.leaflens.viewmodel.ResultViewModel
 
 
@@ -41,14 +39,8 @@ class UploadFragment : Fragment() {
         uploadButton = view.findViewById(R.id.uploadButton)
         classifyButton = view.findViewById(R.id.classifyButton)
 
-        val toolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setUpToolBar(view)
 
-        // Handle the navigation icon click
-        toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
 
         // Button to open image picker
         uploadButton.setOnClickListener {
@@ -57,21 +49,7 @@ class UploadFragment : Fragment() {
 
         // Button to classify the selected image
         classifyButton.setOnClickListener {
-            selectedImageUri?.let { uri ->
-                val bitmap = uriToBitmap(uri)
-                bitmap?.let {
-                    if (resultViewModel.validateMaizeImage(requireContext(),it)) {
-                        val bundle = Bundle().apply {
-                            putString("imagePath", uri.toString())
-                        }
-                        findNavController().navigate(R.id.action_uploadFragment_to_resultFragment, bundle)
-                    } else {
-                        showToast("The image is not valid.")
-                    }
-                }
-            } ?: run {
-                showToast("Please select an image.")
-            }
+            selectImage()
         }
 
         return view
@@ -99,7 +77,7 @@ class UploadFragment : Fragment() {
     }
 
     // Convert Uri to Bitmap
-    private fun uriToBitmap(uri: Uri): Bitmap? {
+  /*  private fun uriToBitmap(uri: Uri): Bitmap? {
         return try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
                 val source = ImageDecoder.createSource(requireContext().contentResolver, uri)
@@ -111,7 +89,7 @@ class UploadFragment : Fragment() {
             e.printStackTrace()
             null
         }
-    }
+    }*/
 
     // Validate the image using TFLite model
    /* private fun validateMaizeImage(bitmap: Bitmap): Boolean {
@@ -201,6 +179,39 @@ class UploadFragment : Fragment() {
         model.run(inputBuffer, outputBuffer.buffer.rewind())
         return outputBuffer.floatArray[0]
     }*/
+
+
+    //set up of tool bar
+    private fun setUpToolBar(view: View) {
+        val toolbar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+
+        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+    }
+
+
+    //function to validate image selection
+    fun selectImage(){
+        selectedImageUri?.let { uri ->
+            val bitmap = uriToBitmap(uri,requireContext())
+            bitmap?.let {
+                if (resultViewModel.validateMaizeImage(requireContext(),it)) {
+                    val bundle = Bundle().apply {
+                        putString("imagePath", uri.toString())
+                    }
+                    findNavController().navigate(R.id.action_uploadFragment_to_resultFragment, bundle)
+                } else {
+                    showToast("The image is not valid.")
+                }
+            }
+        } ?: run {
+            showToast("Please select an image.")
+        }
+    }
 
     // Display a toast message
     private fun showToast(message: String) {
