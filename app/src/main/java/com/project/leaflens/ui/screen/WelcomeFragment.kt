@@ -32,8 +32,8 @@ class WelcomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val btnStartCamera = view.findViewById<ImageView>(R.id.btnStartCamera)
         btnStartCamera.setOnClickListener {
-           // findNavController().navigate(R.id.action_welcomeFragment_to_cameraFragment)
-            findNavController().navigate(R.id.action_welcomeFragment_to_uploadFragment)
+            findNavController().navigate(R.id.action_welcomeFragment_to_cameraFragment)
+           // findNavController().navigate(R.id.action_welcomeFragment_to_uploadFragment)
         }
     }
 

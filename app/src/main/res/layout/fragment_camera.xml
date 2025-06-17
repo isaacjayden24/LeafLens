@@ -1,24 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.screen.CameraFragment"
-    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="#000000"
+tools:context=".ui.screen.CameraFragment"
+>
 
+<!-- Camera Preview -->
 <androidx.camera.view.PreviewView
-    android:id="@+id/previewView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:id="@+id/viewFinder"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:scaleType="fitCenter" />
 
-<Button
-    android:id="@+id/btnCapture"
-    android:layout_width="wrap_content"
+<!-- Bottom control bar -->
+<LinearLayout
+    android:id="@+id/bottomBar"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:text="Capture"
-    android:layout_gravity="center|bottom"
-    android:padding="10dp"
-    android:background="@color/black"
-    android:textColor="@color/white"/>
-</FrameLayout>
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="@android:color/black"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
+
+    <!-- Capture Image Button -->
+    <ImageButton
+        android:id="@+id/image_capture_button"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/capture_button_background"
+        android:contentDescription="Take Photo"
+        android:src="@drawable/ic_camera"
+        app:tint="@android:color/white" />
+
+    <!-- Spacer -->
+    <Space
+        android:layout_width="32dp"
+        android:layout_height="wrap_content" />
+
+    <!-- Record Video Button -->
+    <ImageButton
+        android:id="@+id/video_capture_button"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/capture_button_background"
+        android:contentDescription="Start Capture"
+        android:src="@drawable/ic_record"
+        app:tint="@android:color/white" />
+</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
 
 

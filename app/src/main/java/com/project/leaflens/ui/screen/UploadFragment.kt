@@ -217,6 +217,9 @@ class UploadFragment : Fragment() {
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
+
+    //TODO: check if the fragment  code is on a clean architecture and good principles
+
 }
 
 
