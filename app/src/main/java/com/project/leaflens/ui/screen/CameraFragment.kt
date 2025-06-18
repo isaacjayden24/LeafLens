@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -37,6 +38,7 @@ class CameraFragment : Fragment() {
     private var recording: Recording? = null
 
     private lateinit var viewFinder:PreviewView //TODO:Some correction and reference need to be done here
+    private lateinit var imageBtn: ImageButton
 
 
     private lateinit var cameraExecutor: ExecutorService
@@ -60,6 +62,7 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewFinder=view.findViewById(R.id.viewFinder)
+        imageBtn=view.findViewById(R.id.image_capture_button)
         //request camera permission
         if (allPermissionsGranted()){
             try {
@@ -81,6 +84,11 @@ class CameraFragment : Fragment() {
                 Toast.makeText(requireContext(), "Permission request failed.", Toast.LENGTH_SHORT).show()
             }
         }
+
+        imageBtn.setOnClickListener {
+            takePhoto()
+        }
+
 
 
         cameraExecutor = Executors.newSingleThreadExecutor()
